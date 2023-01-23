@@ -37,13 +37,23 @@ app.post("/api/notes", (req, res) => {
     //Responds with the note list
     res.json(noteList);
 });
-
+//Function for deleting
 app.delete("/api/notes/:id", (req, res) => {
-    const noteList = JSON.parse(fs.readFileSync(db))
-    const noteDelete = noteList.filter((deleteNote) => deleteNote.id !== req.params.id);
-    fs.writeFileSync(db, JSON.stringify(noteDelete));
-    res.json(noteDelete);
+    //Retrieves the note list from the db
+    const noteList = JSON.parse(fs.readFileSync(db));
+    //Loops through the list of notes to find the note with the same ID as the request, and then removes that note from the array
+    noteList.forEach(note => {
+        if(note.id == req.params.id) {
+            var noteDelete = noteList.indexOf(note);
+            noteList.splice(noteDelete, 1);
+            return noteList;
+        };
+    });
+    //Writes adjusted list back to the db array
+    fs.writeFileSync(db, JSON.stringify(noteList));
+    res.json(noteList);
 });
+
 //Calls to the HTML
 //Wildcard, if anything is put in address, go to index.html
 app.get("/notes", (req, res) => {
