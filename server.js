@@ -17,15 +17,14 @@ app.use(express.static("./public"));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-//Route for API
-//Route for getting
+//Function for getting
 app.get("/api/notes", (req, res) => {
     //Retrieves the note list from the db
     const noteList = JSON.parse(fs.readFileSync(database))
     //Responds with the note list
     res.json(noteList);
 });
-//Route for posting
+//Function for posting
 app.post("/api/notes", (req, res) => {
     //Creates a new note using the body of the request
     const noteNew = req.body;
@@ -41,10 +40,28 @@ app.post("/api/notes", (req, res) => {
     res.json(noteList);
 });
 
-//Route for deleting
+//Function for deleting
 app.delete("/api/notes/:id", (req, res) => {
     const noteList = JSON.parse(fs.readFileSync(database))
     const noteDelete = noteList.filter((deleteNote) => deleteNote.id !== req.params.id);
     fs.writeFileSync(database, JSON.stringify(noteDelete));
     res.json(noteDelete);
+});
+
+//Calls to the HTML
+//Wildcard, if anything is put in address, go to index.html
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "./public/index.html"));
+});
+//If nothing is put in address after /, go to index.html
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "./public/index.html"));
+});
+//If notes is placed at the ned of address, go to notes.html
+app.get("/notes", (req, res) => {
+    res.sendFile(path.join(__dirname, "./public/notes.html"));
+});
+
+app.listen(PORT, () => {
+    console.log(`App is listening at http://localhost:${PORT}`);
 });
